@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { @apply bg-slate-50 text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100; }
+button, input { font: inherit; }
+
+@layer components {
+  .card { @apply rounded-2xl border border-slate-100 bg-white p-5 shadow-card dark:border-slate-800 dark:bg-slate-900; }
+  .section-title { @apply text-lg font-bold tracking-tight text-slate-900 dark:text-white; }
+  .muted { @apply text-sm text-slate-500 dark:text-slate-400; }
+}

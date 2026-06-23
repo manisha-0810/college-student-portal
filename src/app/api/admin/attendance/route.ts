@@ -1,0 +1,5 @@
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/admin-auth";
+export async function GET() { if (!await requireAdmin()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 }); return NextResponse.json(await prisma.attendance.findMany({ include: { student: { select: { name: true, usn: true } }, subject: { select: { code: true, name: true } } }, orderBy: { student: { usn: "asc" } } })); }
+export async function POST(request: Request) { if (!await requireAdmin()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 }); try { const { studentId, subjectId, percentage } = await request.json(); const value = Number(percentage); if (!studentId || !subjectId || !Number.isFinite(value) || value < 0 || value > 100) throw new Error(); return NextResponse.json(await prisma.attendance.upsert({ where: { studentId_subjectId: { studentId, subjectId } }, update: { percentage: value }, create: { studentId, subjectId, percentage: value } })); } catch { return NextResponse.json({ error: "Provide a valid student, subject and percentage (0–100)." }, { status: 400 }); } }

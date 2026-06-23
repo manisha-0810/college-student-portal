@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Student {
+  id         String       @id @default(cuid())
+  usn        String       @unique
+  name       String
+  email      String       @unique
+  department String
+  semester   Int
+  passwordHash String
+  role       UserRole @default(STUDENT)
+  attendance Attendance[]
+  marks      Marks[]
+  payments   Payment[]
+}
+
+model Subject {
+  id         String       @id @default(cuid())
+  code       String       @unique
+  name       String
+  credits    Int
+  attendance Attendance[]
+  marks      Marks[]
+}
+
+model Attendance {
+  id         String  @id @default(cuid())
+  percentage Float
+  studentId  String
+  subjectId  String
+  student    Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subject    Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, subjectId])
+  @@index([subjectId])
+}
+
+model Marks {
+  id            String  @id @default(cuid())
+  internalMarks Float
+  finalMarks    Float
+  studentId     String
+  subjectId     String
+  student       Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subject       Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, subjectId])
+  @@index([subjectId])
+}
+
+model Payment {
+  id          String        @id @default(cuid())
+  amount      Decimal       @db.Decimal(10, 2)
+  paymentDate DateTime
+  status      PaymentStatus
+  studentId   String
+  student     Student       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  OVERDUE
+  FAILED
+}
+
+enum UserRole {
+  STUDENT
+  ADMIN
+}

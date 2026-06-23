@@ -1,0 +1,8 @@
+import { NextResponse } from "next/server";
+import { hash } from "bcryptjs";
+import { Prisma } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/admin-auth";
+
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) { if (!await requireAdmin()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 }); try { const body = await request.json(); const { id } = await params; const data: Prisma.StudentUpdateInput = {}; if (typeof body.name === "string" && body.name.trim()) data.name = body.name.trim(); if (typeof body.email === "string" && body.email.trim()) data.email = body.email.trim().toLowerCase(); if (typeof body.department === "string" && body.department.trim()) data.department = body.department.trim(); if (typeof body.usn === "string" && body.usn.trim()) data.usn = body.usn.trim().toUpperCase(); if (body.semester !== undefined && Number.isInteger(Number(body.semester))) data.semester = Number(body.semester); if (typeof body.password === "string" && body.password) data.passwordHash = await hash(body.password, 12); return NextResponse.json(await prisma.student.update({ where: { id }, data })); } catch { return NextResponse.json({ error: "Unable to update student." }, { status: 400 }); } }
+export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) { const admin = await requireAdmin(); if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 }); const { id } = await params; if (admin.id === id) return NextResponse.json({ error: "You cannot delete your own account." }, { status: 400 }); await prisma.student.delete({ where: { id } }); return new NextResponse(null, { status: 204 }); }
