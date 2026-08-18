@@ -12,7 +12,7 @@ const subjectData = [
 ];
 
 const studentData = [
-  ["1CH24CS001", "Manisha Kumari", "manisha.kumari@campushub.edu"],
+  ["1CH24CS001", "Aarav Sharma", "aarav.sharma@campushub.edu"],
   ["1CH24CS002", "Diya Nair", "diya.nair@campushub.edu"],
   ["1CH24CS003", "Kabir Singh", "kabir.singh@campushub.edu"],
   ["1CH24CS004", "Ananya Reddy", "ananya.reddy@campushub.edu"],
